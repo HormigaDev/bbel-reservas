@@ -5,15 +5,15 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Resource } from 'src/global/entities/resource.entity';
+import { Resource } from 'src/app/entities/resource.entity';
 import { Repository } from 'typeorm';
 import { ResourcesServiceInterface } from './resources.service.interface';
 import { RegisterResourceDto } from './DTOs/register-resource.dto';
-import { QueryEntityDto } from 'src/global/DTOs/query-entity.dto';
+import { QueryEntityDto } from 'src/app/DTOs/query-entity.dto';
 import {
     filterNonNullableProps,
     validateLimit,
-} from 'src/global/helpers/service.helper';
+} from 'src/app/helpers/service.helper';
 import { UpdateResourceDto } from './DTOs/update-resource.dto';
 
 @Injectable()

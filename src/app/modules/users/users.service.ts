@@ -6,13 +6,13 @@ import {
     UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserDto } from 'src/global/modules/users/DTOs/create-user.dto';
-import { User } from 'src/global/entities/user.entity';
-import { UsersServiceInterface } from 'src/global/modules/users/users.service.interface';
+import { CreateUserDto } from 'src/app/modules/users/DTOs/create-user.dto';
+import { User } from 'src/app/entities/user.entity';
+import { UsersServiceInterface } from 'src/app/modules/users/users.service.interface';
 import { Repository } from 'typeorm';
-import { UpdateUserDto } from 'src/global/modules/users/DTOs/update-user.dto';
+import { UpdateUserDto } from 'src/app/modules/users/DTOs/update-user.dto';
 import { AuthService } from '../auth/auth.service';
-import { ChangeUserPasswordDto } from 'src/global/modules/users/DTOs/change-user-password.dto';
+import { ChangeUserPasswordDto } from 'src/app/modules/users/DTOs/change-user-password.dto';
 import {
     filterNonNullableProps,
     EmailRegex,
@@ -20,8 +20,8 @@ import {
     PhoneRegex,
     PasswordRegex,
     validateLimit,
-} from 'src/global/helpers/service.helper';
-import { QueryEntityDto } from 'src/global/DTOs/query-entity.dto';
+} from 'src/app/helpers/service.helper';
+import { QueryEntityDto } from 'src/app/DTOs/query-entity.dto';
 
 @Injectable()
 export class UsersService implements UsersServiceInterface {

@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { User } from 'src/global/entities/user.entity';
+import { User } from 'src/app/entities/user.entity';
 
 @Injectable()
 export class AuthService {

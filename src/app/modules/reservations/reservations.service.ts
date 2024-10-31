@@ -5,7 +5,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { ReservationsServiceInterface } from './reservations.service.interface';
-import { Reservation } from 'src/global/entities/reservation.entity';
+import { Reservation } from 'src/app/entities/reservation.entity';
 import { CreateReservationDto } from './DTOs/create-reservation.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,11 +15,11 @@ import {
     filterNonNullableProps,
     TimeRegex,
     validateLimit,
-} from 'src/global/helpers/service.helper';
+} from 'src/app/helpers/service.helper';
 import { ReservationStatus } from './enums/reservation-status.enum';
 import { UsersService } from '../users/users.service';
 import { ResourcesService } from '../resources/resources.service';
-import { QueryEntityDto } from 'src/global/DTOs/query-entity.dto';
+import { QueryEntityDto } from 'src/app/DTOs/query-entity.dto';
 import { UpdateReservationDto } from './DTOs/update-reservation.dto';
 
 @Injectable()

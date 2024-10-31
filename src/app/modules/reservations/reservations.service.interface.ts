@@ -1,6 +1,6 @@
-import { Reservation } from 'src/global/entities/reservation.entity';
+import { Reservation } from 'src/app/entities/reservation.entity';
 import { CreateReservationDto } from './DTOs/create-reservation.dto';
-import { QueryEntityDto } from 'src/global/DTOs/query-entity.dto';
+import { QueryEntityDto } from 'src/app/DTOs/query-entity.dto';
 import { UpdateReservationDto } from './DTOs/update-reservation.dto';
 
 export interface ReservationsServiceInterface {
