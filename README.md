@@ -1,3 +1,5 @@
-# Ant's Restaurant
+# BBEL Reserved
+
 ## Un proyecto NestJS
-Es una API simple para un sistema de reservas de mesas en un restaurante.
+
+Es una API simple para un sistema de reservas de recursos (Inicialmente pensado para restaurante)
