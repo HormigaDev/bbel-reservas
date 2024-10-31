@@ -23,4 +23,6 @@ export interface UsersServiceInterface {
     login(email: string, password: string): Promise<string>;
 
     changePassword(id: number, dto: ChangeUserPasswordDto): Promise<void>;
+
+    validateUser(id: number): Promise<void>;
 }

@@ -182,6 +182,28 @@ export class UsersService implements UsersServiceInterface {
         }
     }
 
+    async validateUser(id: number): Promise<void> {
+        const queryRunner = this.userRepository.queryRunner;
+
+        await queryRunner.connect();
+        try {
+            const result = await queryRunner.query(
+                `
+                    select true as exists from users
+                    where id = $1
+                `,
+                [id],
+            );
+            if (result !== 0) {
+                throw new NotFoundException(
+                    `No se ha encontrado ningún usuario con el ID: ${id}`,
+                );
+            }
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
     /**
      * Verifica si existe el usuario y si la contraseña es correspondiente
      * a la que está en la base de datos
@@ -230,25 +252,11 @@ export class UsersService implements UsersServiceInterface {
      * @param email - El correo electrónico del usuario
      * @throws {ConflictException}
      */
-    private async checkUserExists(email: string): Promise<void> {
+    async checkUserExists(email: string): Promise<void> {
         const user = await this.userRepository.findOneBy({ email });
         if (user) {
             throw new ConflictException(
                 `Ya existe un usuario con el email: ${email}`,
-            );
-        }
-    }
-
-    /**
-     * Valida si el usuario existe en la base de datos. Si no existe lanza un error http.
-     * @param id - El id del usuario
-     * @throws {NotFoundException}
-     */
-    private async validateUser(id: number) {
-        const user = await this.findById(id);
-        if (!user) {
-            throw new NotFoundException(
-                `No se ha encontrado ningún usuario con el ID: ${id}`,
             );
         }
     }

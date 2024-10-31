@@ -17,4 +17,6 @@ export interface ResourcesServiceInterface {
     updateResource(id: number, dto: UpdateResourceDto): Promise<void>;
 
     deleteResource(id: number): Promise<void>;
+
+    validateResource(id: number): Promise<void>;
 }

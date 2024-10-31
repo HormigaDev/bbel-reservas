@@ -29,6 +29,21 @@ export const NameRegex = /^[a-zA-Z\s]{2,}$/;
 export const PhoneRegex = /^[0-9]{11,15}$/;
 
 /**
+ * Permite años entre 1900 y 2099
+ * Permite meses entre 01 y 12
+ * Permite días entre 01 y 31
+ */
+export const DateRegex =
+    /^(?:19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
+
+/**
+ * Permite horas entre 00 y 23
+ * Permite minutos entre 00 y 59
+ * Permite segundos entre 00 y 59
+ */
+export const TimeRegex = /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/;
+
+/**
  * Los límites de consulta para métodos que devuelvan muchos resultados
  */
 export const QueryLimits = [10, 20, 30, 50, 100];

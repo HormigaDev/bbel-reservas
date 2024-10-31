@@ -94,12 +94,32 @@ export class ResourcesService implements ResourcesServiceInterface {
         await this.resourceRepository.delete({ id });
     }
 
-    private async validateResource(id: number) {
-        const resource = await this.findById(id);
+    async validateResource(id: number): Promise<void> {
+        /* const resource = await this.findById(id);
         if (!resource) {
             throw new NotFoundException(
                 `No existe ningún recurso con el ID: ${id}`,
             );
+        } */
+        const queryRunner = this.resourceRepository.queryRunner;
+
+        await queryRunner.connect();
+        try {
+            const result = await queryRunner.query(
+                `
+                select true as exists from resources
+                where id = $1    
+            `,
+                [id],
+            );
+
+            if (result.length === 0) {
+                throw new NotFoundException(
+                    `No existe ningún recurso con el ID: ${id}`,
+                );
+            }
+        } finally {
+            await queryRunner.release();
         }
     }
 

@@ -14,6 +14,7 @@ import { AuthController } from './global/modules/auth/auth.controller';
 import { AuthMiddleware } from './global/middlewares/auth.middleware';
 import { ResourcesModule } from './global/modules/resources/resources.module';
 import { AuthModule } from './global/modules/auth/auth.module';
+import { ReservationsModule } from './global/modules/reservations/reservations.module';
 
 @Module({
     imports: [
@@ -33,6 +34,7 @@ import { AuthModule } from './global/modules/auth/auth.module';
         UsersModule,
         ResourcesModule,
         AuthModule,
+        ReservationsModule,
     ],
     controllers: [AppController, AuthController],
     providers: [AppService, AuthService],
