@@ -3,7 +3,6 @@ import {
     ConflictException,
     Injectable,
     NotFoundException,
-    UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/app/modules/users/DTOs/create-user.dto';
@@ -11,25 +10,20 @@ import { User } from 'src/app/entities/user.entity';
 import { UsersServiceInterface } from 'src/app/modules/users/users.service.interface';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from 'src/app/modules/users/DTOs/update-user.dto';
-import { AuthService } from '../auth/auth.service';
-import { ChangeUserPasswordDto } from 'src/app/modules/users/DTOs/change-user-password.dto';
 import {
     filterNonNullableProps,
     EmailRegex,
     NameRegex,
     PhoneRegex,
-    PasswordRegex,
     validateLimit,
 } from 'src/app/helpers/service.helper';
 import { QueryEntityDto } from 'src/app/DTOs/query-entity.dto';
-import { LoginDto } from './DTOs/login.dto';
 
 @Injectable()
 export class UsersService implements UsersServiceInterface {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-        private readonly authService: AuthService,
     ) {}
 
     async createUser(dto: CreateUserDto): Promise<User> {
@@ -49,23 +43,11 @@ export class UsersService implements UsersServiceInterface {
             );
         }
 
-        if (!PasswordRegex.test(dto.password)) {
-            throw new BadRequestException(
-                [
-                    'La contraseña es inválida.',
-                    'La contraseña debe tener 1 caracter especial, 1 letra minúscula,',
-                    '1 letra mayúscula y debe tener al menos 8 caracteres',
-                ].join(' '),
-            );
-        }
-
-        dto.password = await this.authService.hashPassword(dto.password);
-
         const user = this.userRepository.create(dto);
         return await this.userRepository.save(user);
     }
 
-    async findById(id: number): Promise<User> {
+    async findById(id: number, withPassword: boolean = false): Promise<User> {
         const user: User = await this.userRepository.findOneBy({ id });
 
         if (!user) {
@@ -74,7 +56,9 @@ export class UsersService implements UsersServiceInterface {
             );
         }
 
-        delete user.password;
+        if (!withPassword){
+            delete user.password;
+        }
         return user;
     }
 
@@ -138,64 +122,6 @@ export class UsersService implements UsersServiceInterface {
         await this.userRepository.delete({ id });
     }
 
-    async login(dto: LoginDto): Promise<string> {
-        const user = await this.findByEmail(dto.email);
-        if (!user) {
-            throw new NotFoundException(
-                `No se ha encontrado ningun usuario con el email: ${dto.email}`,
-            );
-        }
-
-        if (
-            !(await this.authService.verifyPassword(
-                dto.password,
-                user.password,
-            ))
-        ) {
-            throw new UnauthorizedException(`Usuario o contraseña incorrectos`);
-        }
-        return await this.authService.generateToken(user);
-    }
-
-    async changePassword(
-        id: number,
-        dto: ChangeUserPasswordDto,
-    ): Promise<void> {
-        await this.validateUser(id);
-        await this.verifyPassword(id, null, dto.prevPassword);
-
-        if (dto.prevPassword === dto.newPassword) {
-            throw new BadRequestException(
-                'La nueva contraseña no puede ser igual a la anterior',
-            );
-        }
-
-        if (!PasswordRegex.test(dto.newPassword)) {
-            throw new BadRequestException(
-                [
-                    'La contraseña nueva debe contener al menos 1 caracter especial,',
-                    '1 letra minúscula, 1 letra mayúscula y tener al menos 8 caracteres.',
-                ].join(' '),
-            );
-        }
-
-        const hashedPassword = await this.authService.hashPassword(
-            dto.newPassword,
-        );
-        const result = await this.userRepository
-            .createQueryBuilder()
-            .update()
-            .set({ password: hashedPassword })
-            .where('id = :id', { id })
-            .execute();
-
-        if (result.affected === 0) {
-            throw new BadRequestException(
-                'No se pudo actualizar la contraseña. Intente nuevamente.',
-            );
-        }
-    }
-
     async validateUser(id: number): Promise<void> {
         const queryRunner = this.userRepository.queryRunner;
 
@@ -215,49 +141,6 @@ export class UsersService implements UsersServiceInterface {
             }
         } finally {
             await queryRunner.release();
-        }
-    }
-
-    /**
-     * Verifica si existe el usuario y si la contraseña es correspondiente
-     * a la que está en la base de datos
-     * Nota: debe ser informado un ID o un email, se considera primero el id y luego el email.
-     * @param id - El id del usuario a validar (opcional)
-     * @param email - El email del usuario a validar (opcional)
-     * @param password - La contraseña actual del usuario
-     * @throws {NotFoundException | UnauthorizedException}
-     */
-    private async verifyPassword(
-        id: number | null,
-        email: string | null,
-        password: string,
-    ): Promise<void> {
-        let user: User;
-        if (id) {
-            user = await this.userRepository.findOneBy({ id });
-            if (!user) {
-                throw new NotFoundException(
-                    `No se ha encontrado ningún usuario con el ID: ${id}`,
-                );
-            }
-        }
-        if (email) {
-            user = await this.findByEmail(email);
-            if (!user) {
-                throw new NotFoundException(
-                    `No se ha encontrado ningún usuario con el email: ${email}`,
-                );
-            }
-        }
-
-        const isPasswordCorrect = await this.authService.verifyPassword(
-            password,
-            user.password,
-        );
-        if (!isPasswordCorrect) {
-            throw new UnauthorizedException(
-                `La contraseña actual informada es inválida`,
-            );
         }
     }
 

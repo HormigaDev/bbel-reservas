@@ -9,8 +9,6 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './app/modules/users/users.module';
-import { AuthService } from './app/modules/auth/auth.service';
-import { AuthController } from './app/modules/auth/auth.controller';
 import { AuthMiddleware } from './app/middlewares/auth.middleware';
 import { ResourcesModule } from './app/modules/resources/resources.module';
 import { AuthModule } from './app/modules/auth/auth.module';
@@ -36,8 +34,8 @@ import { ReservationsModule } from './app/modules/reservations/reservations.modu
         AuthModule,
         ReservationsModule,
     ],
-    controllers: [AppController, AuthController],
-    providers: [AppService, AuthService],
+    controllers: [AppController],
+    providers: [AppService],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

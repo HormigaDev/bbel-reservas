@@ -12,4 +12,8 @@ export class UpdateUserDto {
     @IsOptional()
     @IsString({ message: 'El email debe ser un texto válido' })
     email?: string;
+
+    @IsOptional()
+    @IsString()
+    password?: string;
 }

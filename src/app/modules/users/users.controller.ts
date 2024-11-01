@@ -5,18 +5,13 @@ import {
     Get,
     HttpCode,
     Param,
-    Patch,
-    Post,
     Put,
     Query,
     UseGuards,
 } from '@nestjs/common';
-import { LoginDto } from './DTOs/login.dto';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './DTOs/create-user.dto';
 import { User } from 'src/app/entities/user.entity';
 import { UpdateUserDto } from './DTOs/update-user.dto';
-import { ChangeUserPasswordDto } from './DTOs/change-user-password.dto';
 import { AdminGuard } from 'src/app/guards/roles.guard';
 
 /**
@@ -25,21 +20,6 @@ import { AdminGuard } from 'src/app/guards/roles.guard';
 @Controller('users')
 export class UsersController {
     constructor(private readonly userService: UsersService) {}
-
-    //CREATE
-    @Post('login')
-    @HttpCode(200)
-    async login(@Body() loginDto: LoginDto) {
-        const token: string = await this.userService.login(loginDto);
-        return { token };
-    }
-
-    @Post('register')
-    @HttpCode(201)
-    async register(@Body() registerDto: CreateUserDto) {
-        const user: User = await this.userService.createUser(registerDto);
-        return { user };
-    }
 
     //READ
     @Get(':id')
@@ -56,7 +36,7 @@ export class UsersController {
         @Query('limit') limit: number,
         @Query('page') page: number,
     ): Promise<{ users: User[] }> {
-        const users = await this.userService.getUsers({
+        const users: User[] = await this.userService.getUsers({
             perPage: limit,
             page: page,
         });
@@ -72,7 +52,7 @@ export class UsersController {
         @Query('page') page: number,
         @Query('text') text: string,
     ): Promise<{ users: User[] }> {
-        const users = await this.userService.searchUsers({
+        const users: User[] = await this.userService.searchUsers({
             perPage: limit,
             page: page,
             query: text,
@@ -86,18 +66,8 @@ export class UsersController {
     async updateUser(
         @Param('id') id: number,
         @Body() updateUserDto: UpdateUserDto,
-    ): Promise<void> {
-        await this.userService.updateUser(id, updateUserDto);
-        return;
-    }
-
-    @Patch(':id/change-password')
-    @HttpCode(204)
-    async changeUserPassword(
-        @Param('id') id: number,
-        @Body() changePasswordDto: ChangeUserPasswordDto,
     ): Promise<object> {
-        await this.userService.changePassword(id, changePasswordDto);
+        await this.userService.updateUser(id, updateUserDto);
         return {};
     }
 
