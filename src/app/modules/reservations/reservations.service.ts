@@ -19,8 +19,9 @@ import {
 import { ReservationStatus } from './enums/reservation-status.enum';
 import { UsersService } from '../users/users.service';
 import { ResourcesService } from '../resources/resources.service';
-import { QueryEntityDto } from 'src/app/DTOs/query-entity.dto';
 import { UpdateReservationDto } from './DTOs/update-reservation.dto';
+import { ReservationQueryDto } from './DTOs/reservation-query.dto';
+import { QueryEntityDto } from 'src/app/DTOs/query-entity.dto';
 
 @Injectable()
 export class ReservationsService implements ReservationsServiceInterface {
@@ -56,13 +57,70 @@ export class ReservationsService implements ReservationsServiceInterface {
         return reservation;
     }
 
-    async getReservations(dto: QueryEntityDto): Promise<Reservation[]> {
+    async getReservations(
+        dto: ReservationQueryDto,
+    ): Promise<{ reservations: Reservation[]; count: number }> {
         const limit = validateLimit(dto.perPage);
-        const reservations = await this.reservationRepository.find({
-            take: limit,
-            skip: dto.page,
-        });
-        return reservations;
+
+        if (!DateRegex.test(dto.startDate) || !DateRegex.test(dto.endDate)) {
+            throw new BadRequestException(
+                'Las fechas de inicio y fin deben cumplir el formato YYYY-MM-DD',
+            );
+        }
+        if (!TimeRegex.test(dto.startTime) || !TimeRegex.test(dto.endTime)) {
+            throw new BadRequestException(
+                'Los horarios de inicio y fin deben cumplir el formato HH:MM:SS',
+            );
+        }
+
+        const reservations: Reservation[] = await this.reservationRepository
+            .createQueryBuilder('r')
+            .where(
+                'r.reservation_date between (:startDate)::date and (:endDate)::date',
+                { startDate: dto.startDate, endDate: dto.endDate },
+            )
+            .andWhere('r.start_time >= (:startTime)::time', {
+                startTime: dto.startTime,
+            })
+            .andWhere('r.end_time <= (:endTime)::time', {
+                endTime: dto.endTime,
+            })
+            .take(limit)
+            .skip(dto.page * limit)
+            .getMany();
+
+        const reservationsCount: number = await this.reservationRepository
+            .createQueryBuilder('r')
+            .where(
+                'r.reservation_date between (:startDate)::date and (:endDate)::date',
+                { startDate: dto.startDate, endDate: dto.endDate },
+            )
+            .andWhere('r.start_time >= (:startTime)::time', {
+                startTime: dto.startTime,
+            })
+            .andWhere('r.end_time <= (:endTime)::time', {
+                endTime: dto.endTime,
+            })
+            .getCount();
+
+        return { reservations: reservations ?? [], count: reservationsCount };
+    }
+
+    async getAllReservations(
+        dto: QueryEntityDto,
+    ): Promise<{ reservations: Reservation[]; count: number }> {
+        const limit = validateLimit(dto.perPage);
+        const reservations: Reservation[] =
+            await this.reservationRepository.find({
+                take: limit,
+                skip: dto.page * limit,
+            });
+
+        const reservationsCount: number = await this.reservationRepository
+            .createQueryBuilder()
+            .getCount();
+
+        return { reservations: reservations ?? [], count: reservationsCount };
     }
 
     async updateReservation(
