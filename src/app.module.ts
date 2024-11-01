@@ -8,13 +8,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { UsersModule } from './global/modules/users/users.module';
-import { AuthService } from './global/modules/auth/auth.service';
-import { AuthController } from './global/modules/auth/auth.controller';
-import { AuthMiddleware } from './global/middlewares/auth.middleware';
-import { ResourcesModule } from './global/modules/resources/resources.module';
-import { AuthModule } from './global/modules/auth/auth.module';
-import { ReservationsModule } from './global/modules/reservations/reservations.module';
+import { UsersModule } from './app/modules/users/users.module';
+import { AuthMiddleware } from './app/middlewares/auth.middleware';
+import { ResourcesModule } from './app/modules/resources/resources.module';
+import { AuthModule } from './app/modules/auth/auth.module';
+import { ReservationsModule } from './app/modules/reservations/reservations.module';
 
 @Module({
     imports: [
@@ -36,8 +34,8 @@ import { ReservationsModule } from './global/modules/reservations/reservations.m
         AuthModule,
         ReservationsModule,
     ],
-    controllers: [AppController, AuthController],
-    providers: [AppService, AuthService],
+    controllers: [AppController],
+    providers: [AppService],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
