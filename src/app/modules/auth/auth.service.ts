@@ -16,14 +16,13 @@ export class AuthService implements AuthServiceInterface {
     ) {}
 
     async login(dto: LoginDto): Promise<string> {
-        const unauthorizedMessage = 'Email o contraseña incorrectos';
         const user = await this.userService.findByEmail(dto.email);
         if(!user){
-            throw new NotFoundException(unauthorizedMessage);
+            throw new NotFoundException('Email o contraseña incorrectos');
         }
         await this.verifyPassword(dto.password, user.password);
 
-        const token = await this.generateToken(user);
+        const token: string = await this.generateToken(user);
         return token;
     }
 
@@ -39,14 +38,14 @@ export class AuthService implements AuthServiceInterface {
             );
         }
         dto.password = await this.hashPassword(dto.password);
-        const user = await this.userService.createUser(dto);
-        const token = await this.generateToken(user);
+        const user: User = await this.userService.createUser(dto);
+        const token: string = await this.generateToken(user);
         delete user.password;
         return {token, user};
     }
 
     async changePassword(id: number, dto: ChangeUserPasswordDto): Promise<void> {
-        const user = await this.userService.getUserById(id);
+        const user: User = await this.userService.getUserById(id);
         await this.verifyPassword(dto.prevPassword, user.password);
         if (!PasswordRegex.test(dto.newPassword)) {
             throw new BadRequestException(
@@ -58,7 +57,7 @@ export class AuthService implements AuthServiceInterface {
             );
         }
     
-        const newPassword = await this.hashPassword(dto.newPassword);
+        const newPassword: string = await this.hashPassword(dto.newPassword);
         await this.userService.updateUser(id, {password: newPassword});
     }
 
