@@ -39,9 +39,16 @@ import { ReservationsModule } from './app/modules/reservations/reservations.modu
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(AuthMiddleware).exclude('public', {
-            path: 'auth/login',
-            method: RequestMethod.POST,
-        });
+        consumer.apply(AuthMiddleware).exclude(
+            'public',
+            {
+                path: 'auth/login',
+                method: RequestMethod.POST,
+            },
+            {
+                path: 'auth/register',
+                method: RequestMethod.POST,
+            },
+        );
     }
 }
