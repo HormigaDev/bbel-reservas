@@ -21,7 +21,6 @@ import { AdminGuard } from 'src/app/guards/roles.guard';
 export class UsersController {
     constructor(private readonly userService: UsersService) {}
 
-    //READ
     @Get(':id')
     @HttpCode(200)
     async getUser(@Param('id') id: number): Promise<{ user: User }> {
@@ -35,13 +34,14 @@ export class UsersController {
     async getUsers(
         @Query('limit') limit: number,
         @Query('page') page: number,
-    ): Promise<{ users: User[] }> {
-        const users: User[] = await this.userService.getUsers({
-            perPage: limit,
-            page: page,
-        });
+    ): Promise<{ users: User[]; count: number }> {
+        const data: { users: User[]; count: number } =
+            await this.userService.getUsers({
+                perPage: limit,
+                page: page,
+            });
 
-        return { users };
+        return data;
     }
 
     @Get('search')
@@ -51,16 +51,16 @@ export class UsersController {
         @Query('limit') limit: number,
         @Query('page') page: number,
         @Query('text') text: string,
-    ): Promise<{ users: User[] }> {
-        const users: User[] = await this.userService.searchUsers({
-            perPage: limit,
-            page: page,
-            query: text,
-        });
-        return { users };
+    ): Promise<{ users: User[]; count: number }> {
+        const data: { users: User[]; count: number } =
+            await this.userService.searchUsers({
+                perPage: limit,
+                page: page,
+                query: text,
+            });
+        return data;
     }
 
-    //UPDATE
     @Put(':id')
     @HttpCode(204)
     async updateUser(
@@ -71,7 +71,6 @@ export class UsersController {
         return {};
     }
 
-    //DELETE
     @Delete(':id')
     @HttpCode(204)
     async deleteUser(@Param('id') id: number): Promise<object> {
