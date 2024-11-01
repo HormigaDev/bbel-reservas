@@ -73,6 +73,7 @@ export class UsersController {
 
     @Delete(':id')
     @HttpCode(204)
+    @UseGuards(AdminGuard)
     async deleteUser(@Param('id') id: number): Promise<object> {
         await this.userService.deleteUser(id);
         return {};
