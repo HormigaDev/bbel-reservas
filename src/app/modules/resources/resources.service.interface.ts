@@ -8,11 +8,13 @@ export interface ResourcesServiceInterface {
 
     findById(id: number): Promise<Resource | null>;
 
-    getResources(dto: QueryEntityDto): Promise<Resource[]>;
+    getResources(
+        dto: QueryEntityDto,
+    ): Promise<{ resources: Resource[]; count: number }>;
 
-    searchResources(dto: QueryEntityDto): Promise<Resource[]>;
-
-    //isResourceAvailable(dto: AvailableResourceDto): Promise<boolean>; TODO: implementar
+    searchResources(
+        dto: QueryEntityDto,
+    ): Promise<{ resources: Resource[]; count: number }>;
 
     updateResource(id: number, dto: UpdateResourceDto): Promise<void>;
 

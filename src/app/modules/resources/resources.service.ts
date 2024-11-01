@@ -41,16 +41,24 @@ export class ResourcesService implements ResourcesServiceInterface {
         return resource;
     }
 
-    async getResources(dto: QueryEntityDto): Promise<Resource[]> {
+    async getResources(
+        dto: QueryEntityDto,
+    ): Promise<{ resources: Resource[]; count: number }> {
         const limit = validateLimit(dto.perPage);
         const resources = await this.resourceRepository.find({
             take: limit,
             skip: dto.page,
         });
-        return resources;
+
+        const countResources: number = await this.resourceRepository
+            .createQueryBuilder()
+            .getCount();
+        return { resources: resources ?? [], count: countResources };
     }
 
-    async searchResources(dto: QueryEntityDto): Promise<Resource[]> {
+    async searchResources(
+        dto: QueryEntityDto,
+    ): Promise<{ resources: Resource[]; count: number }> {
         const limit = validateLimit(dto.perPage);
         if (!dto.query) {
             throw new BadRequestException(
@@ -68,7 +76,15 @@ export class ResourcesService implements ResourcesServiceInterface {
             })
             .getMany();
 
-        return resources;
+        const countResources = await this.resourceRepository
+            .createQueryBuilder('r')
+            .where('r.name like :name', { name: `%${dto.query}%` })
+            .orWhere('r.description like :description', {
+                description: `%${dto.query}%`,
+            })
+            .getCount();
+
+        return { resources: resources ?? [], count: countResources };
     }
 
     async updateResource(id: number, dto: UpdateResourceDto): Promise<void> {
@@ -95,21 +111,12 @@ export class ResourcesService implements ResourcesServiceInterface {
     }
 
     async validateResource(id: number): Promise<void> {
-        /* const resource = await this.findById(id);
-        if (!resource) {
-            throw new NotFoundException(
-                `No existe ningún recurso con el ID: ${id}`,
-            );
-        } */
         const queryRunner = this.resourceRepository.queryRunner;
 
         await queryRunner.connect();
         try {
             const result = await queryRunner.query(
-                `
-                select true as exists from resources
-                where id = $1    
-            `,
+                'select true as exists from resources where id = $1',
                 [id],
             );
 
