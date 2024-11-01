@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/app/modules/users/DTOs/create-user.dto';
 import { User } from 'src/app/entities/user.entity';
 import { UsersServiceInterface } from 'src/app/modules/users/users.service.interface';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { UpdateUserDto } from 'src/app/modules/users/DTOs/update-user.dto';
 import {
     filterNonNullableProps,
@@ -47,7 +47,7 @@ export class UsersService implements UsersServiceInterface {
         return await this.userRepository.save(user);
     }
 
-    async findById(id: number, withPassword: boolean = false): Promise<User> {
+    async findById(id: number): Promise<User> {
         const user: User = await this.userRepository.findOneBy({ id });
 
         if (!user) {
@@ -56,8 +56,16 @@ export class UsersService implements UsersServiceInterface {
             );
         }
 
-        if (!withPassword){
-            delete user.password;
+        delete user.password;
+        return user;
+    }
+
+    async getUserById(id: number): Promise<User> {
+        const user: User = await this.userRepository.findOneBy({id});
+        if (!user) {
+            throw new NotFoundException(
+                `No se ha encontrado ningún usuario con el ID: ${id}`,
+            );
         }
         return user;
     }
@@ -68,7 +76,7 @@ export class UsersService implements UsersServiceInterface {
     }
 
     async searchUsers(dto: QueryEntityDto): Promise<User[]> {
-        const limit = validateLimit(dto.perPage);
+        const limit: number = validateLimit(dto.perPage);
 
         if (!dto.query) {
             throw new BadRequestException(
@@ -88,7 +96,7 @@ export class UsersService implements UsersServiceInterface {
     }
 
     async getUsers(dto: QueryEntityDto): Promise<User[]> {
-        const limit = validateLimit(dto.perPage);
+        const limit: number = validateLimit(dto.perPage);
 
         const users: User[] = await this.userRepository.find({
             take: limit,
@@ -123,7 +131,7 @@ export class UsersService implements UsersServiceInterface {
     }
 
     async validateUser(id: number): Promise<void> {
-        const queryRunner = this.userRepository.queryRunner;
+        const queryRunner: QueryRunner = this.userRepository.queryRunner;
 
         await queryRunner.connect();
         try {
@@ -150,7 +158,7 @@ export class UsersService implements UsersServiceInterface {
      * @throws {ConflictException}
      */
     async checkUserExists(email: string): Promise<void> {
-        const user = await this.userRepository.findOneBy({ email });
+        const user: User = await this.userRepository.findOneBy({ email });
         if (user) {
             throw new ConflictException(
                 `Ya existe un usuario con el email: ${email}`,

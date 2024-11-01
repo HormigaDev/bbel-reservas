@@ -46,7 +46,7 @@ export class AuthService implements AuthServiceInterface {
     }
 
     async changePassword(id: number, dto: ChangeUserPasswordDto): Promise<void> {
-        const user = await this.userService.findById(id, true);
+        const user = await this.userService.getUserById(id);
         await this.verifyPassword(dto.prevPassword, user.password);
         if (!PasswordRegex.test(dto.newPassword)) {
             throw new BadRequestException(

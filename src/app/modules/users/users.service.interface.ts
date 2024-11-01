@@ -6,7 +6,9 @@ import { User } from '../../entities/user.entity';
 export interface UsersServiceInterface {
     createUser(dto: CreateUserDto): Promise<User>;
 
-    findById(id: number, withPassword: boolean): Promise<User>;
+    findById(id: number): Promise<User>;
+
+    getUserById(id: number): Promise<User>;
 
     findByEmail(email: string): Promise<User>;
 
