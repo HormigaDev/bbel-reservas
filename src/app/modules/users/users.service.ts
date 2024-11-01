@@ -22,6 +22,7 @@ import {
     validateLimit,
 } from 'src/app/helpers/service.helper';
 import { QueryEntityDto } from 'src/app/DTOs/query-entity.dto';
+import { LoginDto } from './DTOs/login.dto';
 
 @Injectable()
 export class UsersService implements UsersServiceInterface {
@@ -66,6 +67,14 @@ export class UsersService implements UsersServiceInterface {
 
     async findById(id: number): Promise<User> {
         const user: User = await this.userRepository.findOneBy({ id });
+
+        if (!user) {
+            throw new NotFoundException(
+                `No se ha encontrado ningún usuario con el ID: ${id}`,
+            );
+        }
+
+        delete user.password;
         return user;
     }
 
@@ -91,7 +100,7 @@ export class UsersService implements UsersServiceInterface {
             .orWhere('u.email like :email', { email: `%${dto.query}%` })
             .getMany();
 
-        return users;
+        return users ?? [];
     }
 
     async getUsers(dto: QueryEntityDto): Promise<User[]> {
@@ -102,7 +111,7 @@ export class UsersService implements UsersServiceInterface {
             skip: dto.page,
         });
 
-        return users;
+        return users ?? [];
     }
 
     async updateUser(id: number, dto: UpdateUserDto): Promise<void> {
@@ -129,15 +138,20 @@ export class UsersService implements UsersServiceInterface {
         await this.userRepository.delete({ id });
     }
 
-    async login(email: string, password: string): Promise<string> {
-        const user = await this.findByEmail(email);
+    async login(dto: LoginDto): Promise<string> {
+        const user = await this.findByEmail(dto.email);
         if (!user) {
             throw new NotFoundException(
-                `No se ha encontrado ningun usuario con el email: ${email}`,
+                `No se ha encontrado ningun usuario con el email: ${dto.email}`,
             );
         }
 
-        if (!(await this.authService.verifyPassword(password, user.password))) {
+        if (
+            !(await this.authService.verifyPassword(
+                dto.password,
+                user.password,
+            ))
+        ) {
             throw new UnauthorizedException(`Usuario o contraseña incorrectos`);
         }
         return await this.authService.generateToken(user);
@@ -220,7 +234,7 @@ export class UsersService implements UsersServiceInterface {
     ): Promise<void> {
         let user: User;
         if (id) {
-            user = await this.findById(id);
+            user = await this.userRepository.findOneBy({ id });
             if (!user) {
                 throw new NotFoundException(
                     `No se ha encontrado ningún usuario con el ID: ${id}`,

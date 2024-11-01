@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    Min,
+} from 'class-validator';
 
 export class QueryEntityDto {
     @IsNotEmpty({ message: 'El límite de registros es requerido' })
@@ -10,6 +16,7 @@ export class QueryEntityDto {
 
     @IsNotEmpty({ message: 'La página es requerida' })
     @IsNumber({}, { message: 'La página debe ser un número válido' })
+    @Min(1, { message: 'La página debe ser mayor que 0' })
     page: number;
 
     @IsOptional()
