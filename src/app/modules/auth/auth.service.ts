@@ -10,7 +10,7 @@ import { AuthServiceInterface } from './auth.service.interface';
 import { ChangeUserPasswordDto } from '../users/DTOs/change-user-password.dto';
 
 @Injectable()
-export class AuthService implements AuthServiceInterface{
+export class AuthService implements AuthServiceInterface {
     constructor(
         private readonly userService: UsersService,
     ) {}
