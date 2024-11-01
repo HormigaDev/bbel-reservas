@@ -1,7 +1,0 @@
-## Objetivo?
-* 
-
-## Solución?
-* 
-
-### Reviewer: 
