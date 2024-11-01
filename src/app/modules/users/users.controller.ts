@@ -15,7 +15,7 @@ import { UpdateUserDto } from './DTOs/update-user.dto';
 import { AdminGuard } from 'src/app/guards/roles.guard';
 
 /**
- * Controlador que gestiona la lógica de usuarios y autenticación de los mismos
+ * Controlador que gestiona la lógica de usuarios
  */
 @Controller('users')
 export class UsersController {
