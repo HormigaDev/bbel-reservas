@@ -12,9 +12,9 @@ export interface UsersServiceInterface {
 
     findByEmail(email: string): Promise<User>;
 
-    searchUsers(dto: QueryEntityDto): Promise<User[]>;
+    searchUsers(dto: QueryEntityDto): Promise<{ users: User[]; count: number }>;
 
-    getUsers(dto: QueryEntityDto): Promise<User[]>;
+    getUsers(dto: QueryEntityDto): Promise<{ users: User[]; count: number }>;
 
     updateUser(id: number, dto: UpdateUserDto): Promise<void>;
 

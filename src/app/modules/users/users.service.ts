@@ -61,7 +61,7 @@ export class UsersService implements UsersServiceInterface {
     }
 
     async getUserById(id: number): Promise<User> {
-        const user: User = await this.userRepository.findOneBy({id});
+        const user: User = await this.userRepository.findOneBy({ id });
         if (!user) {
             throw new NotFoundException(
                 `No se ha encontrado ningún usuario con el ID: ${id}`,
@@ -75,7 +75,9 @@ export class UsersService implements UsersServiceInterface {
         return user;
     }
 
-    async searchUsers(dto: QueryEntityDto): Promise<User[]> {
+    async searchUsers(
+        dto: QueryEntityDto,
+    ): Promise<{ users: User[]; count: number }> {
         const limit: number = validateLimit(dto.perPage);
 
         if (!dto.query) {
@@ -85,17 +87,24 @@ export class UsersService implements UsersServiceInterface {
         }
         const users: User[] = await this.userRepository
             .createQueryBuilder('u')
-            .select()
             .take(limit)
             .skip(dto.perPage * dto.page)
             .where('u.name like :name', { name: `%${dto.query}%` })
             .orWhere('u.email like :email', { email: `%${dto.query}%` })
             .getMany();
 
-        return users ?? [];
+        const usersCount = await this.userRepository
+            .createQueryBuilder()
+            .where('u.name like :name', { name: `%${dto.query}%` })
+            .orWhere('u.email like :email', { email: `%${dto.query}%` })
+            .getCount();
+
+        return { users: users ?? [], count: usersCount };
     }
 
-    async getUsers(dto: QueryEntityDto): Promise<User[]> {
+    async getUsers(
+        dto: QueryEntityDto,
+    ): Promise<{ users: User[]; count: number }> {
         const limit: number = validateLimit(dto.perPage);
 
         const users: User[] = await this.userRepository.find({
@@ -103,7 +112,11 @@ export class UsersService implements UsersServiceInterface {
             skip: dto.page,
         });
 
-        return users ?? [];
+        const usersCount = await this.userRepository
+            .createQueryBuilder()
+            .getCount();
+
+        return { users: users ?? [], count: usersCount };
     }
 
     async updateUser(id: number, dto: UpdateUserDto): Promise<void> {
