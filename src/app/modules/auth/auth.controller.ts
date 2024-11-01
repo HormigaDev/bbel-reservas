@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Patch, Post, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from '../users/DTOs/login.dto';
 import { CreateUserDto } from '../users/DTOs/create-user.dto';
@@ -29,13 +29,14 @@ export class AuthController {
         return data;
     }
 
-    @Patch('change-password/:user')
+    @Patch('change-password/')
     @HttpCode(204)
     async changePassword(
-        @Param('user') user: number,
+        @Req() req: Request,
         @Body() changePasswordDto: ChangeUserPasswordDto,
     ): Promise<object> {
-        await this.authService.changePassword(user, changePasswordDto);
+        const session = req['user'];
+        await this.authService.changePassword(session?.id, changePasswordDto);
         return {};
     }
 }

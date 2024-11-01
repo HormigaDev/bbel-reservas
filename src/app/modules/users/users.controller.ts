@@ -7,6 +7,7 @@ import {
     Param,
     Put,
     Query,
+    Req,
     UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -21,10 +22,11 @@ import { AdminGuard } from 'src/app/guards/roles.guard';
 export class UsersController {
     constructor(private readonly userService: UsersService) {}
 
-    @Get(':id')
+    @Get()
     @HttpCode(200)
-    async getUser(@Param('id') id: number): Promise<{ user: User }> {
-        const user: User = await this.userService.findById(id);
+    async getUser(@Req() req: Request): Promise<{ user: User }> {
+        const session = req['user'];
+        const user: User = await this.userService.findById(session?.id);
         return { user };
     }
 
@@ -61,13 +63,14 @@ export class UsersController {
         return data;
     }
 
-    @Put(':id')
+    @Put()
     @HttpCode(204)
     async updateUser(
-        @Param('id') id: number,
+        @Req() req: Request,
         @Body() updateUserDto: UpdateUserDto,
     ): Promise<object> {
-        await this.userService.updateUser(id, updateUserDto);
+        const session = req['user'];
+        await this.userService.updateUser(session?.id, updateUserDto);
         return {};
     }
 
