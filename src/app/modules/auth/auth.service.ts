@@ -1,6 +1,11 @@
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { User } from 'src/app/entities/user.entity';
 import { LoginDto } from '../users/DTOs/login.dto';
 import { UsersService } from '../users/users.service';
@@ -11,13 +16,11 @@ import { ChangeUserPasswordDto } from '../users/DTOs/change-user-password.dto';
 
 @Injectable()
 export class AuthService implements AuthServiceInterface {
-    constructor(
-        private readonly userService: UsersService,
-    ) {}
+    constructor(private readonly userService: UsersService) {}
 
     async login(dto: LoginDto): Promise<string> {
         const user = await this.userService.findByEmail(dto.email);
-        if(!user){
+        if (!user) {
             throw new NotFoundException('Email o contraseña incorrectos');
         }
         await this.verifyPassword(dto.password, user.password);
@@ -26,7 +29,7 @@ export class AuthService implements AuthServiceInterface {
         return token;
     }
 
-    async register(dto: CreateUserDto){
+    async register(dto: CreateUserDto) {
         await this.userService.checkUserExists(dto.email);
         if (!PasswordRegex.test(dto.password)) {
             throw new BadRequestException(
@@ -41,10 +44,13 @@ export class AuthService implements AuthServiceInterface {
         const user: User = await this.userService.createUser(dto);
         const token: string = await this.generateToken(user);
         delete user.password;
-        return {token, user};
+        return { token, user };
     }
 
-    async changePassword(id: number, dto: ChangeUserPasswordDto): Promise<void> {
+    async changePassword(
+        id: number,
+        dto: ChangeUserPasswordDto,
+    ): Promise<void> {
         const user: User = await this.userService.getUserById(id);
         await this.verifyPassword(dto.prevPassword, user.password);
         if (!PasswordRegex.test(dto.newPassword)) {
@@ -56,9 +62,9 @@ export class AuthService implements AuthServiceInterface {
                 ].join(' '),
             );
         }
-    
+
         const newPassword: string = await this.hashPassword(dto.newPassword);
-        await this.userService.updateUser(id, {password: newPassword});
+        await this.userService.updateUser(id, { password: newPassword });
     }
 
     private async generateToken(user: User): Promise<string> {
@@ -96,7 +102,7 @@ export class AuthService implements AuthServiceInterface {
     }
 
     private async hashPassword(password: string): Promise<string> {
-        return await bcrypt.hash(password, process.env.BCRYPT_SALT_ROUNDS);
+        return await bcrypt.hash(password, +process.env.BCRYPT_SALT_ROUNDS);
     }
 
     private async verifyPassword(
@@ -104,7 +110,7 @@ export class AuthService implements AuthServiceInterface {
         encrypted: string,
     ): Promise<void> {
         const isPasswordCorrect = await bcrypt.compare(password, encrypted);
-        if(!isPasswordCorrect){
+        if (!isPasswordCorrect) {
             throw new UnauthorizedException('Email o contraseña incorrectos');
         }
     }
