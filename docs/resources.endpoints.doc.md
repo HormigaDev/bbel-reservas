@@ -1,3 +1,5 @@
+[../](../README.md)
+
 # API de Recursos
 
 Esta documentación describe los endpoints disponibles en el módulo de recursos, que permite crear, buscar, listar, actualizar y eliminar recursos.

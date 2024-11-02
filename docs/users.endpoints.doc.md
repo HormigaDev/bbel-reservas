@@ -1,3 +1,5 @@
+[../](../README.md)
+
 # API de Gestión de Usuarios
 
 Este documento describe los endpoints disponibles para la gestión de usuarios en el sistema.

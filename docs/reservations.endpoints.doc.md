@@ -1,3 +1,5 @@
+[../](../README.md)
+
 # API de Gestión de Reservas
 
 Este documento describe los endpoints disponibles para la gestión de reservas en el sistema.

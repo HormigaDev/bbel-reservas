@@ -1,3 +1,5 @@
+[../](../README.md)
+
 # API de Autenticación de Usuarios
 
 Esta documentación describe los endpoints disponibles en el módulo de autenticación de usuarios, que incluye el inicio de sesión, registro y cambio de contraseña.
