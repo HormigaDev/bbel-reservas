@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateReservationDto {
     @IsNotEmpty({ message: 'La fecha de reserva es requerida' })
@@ -13,12 +13,12 @@ export class CreateReservationDto {
     @IsString({ message: 'La hora final de la reserva es inválida' })
     endTime: string;
 
-    @IsNotEmpty({ message: 'El id del usuario es requerido' })
+    @IsOptional()
     @IsNumber(
         {},
         { message: 'El id del usuario debe ser un número entero válido' },
     )
-    userId: number;
+    userId?: number;
 
     @IsNotEmpty({ message: 'El id del recurso es requerido' })
     @IsNumber({}, { message: 'El id del recurso debe ser un número válido' })
