@@ -210,7 +210,7 @@ export class ReservationsService implements ReservationsServiceInterface {
                 return false;
             }
         } finally {
-            queryRunner.release();
+            await queryRunner.release();
         }
     }
 }

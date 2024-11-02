@@ -4,24 +4,21 @@ import {
     ExecutionContext,
     ForbiddenException,
 } from '@nestjs/common';
-import { UsersService } from '../modules/users/users.service';
 import { UserRoles } from '../modules/users/enums/user.roles.enum';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
-    constructor(private readonly usersService: UsersService) {}
+    constructor() {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
-        const sessionUser = request['user'];
+        const user = request['user'];
 
-        if (!sessionUser) {
+        if (!user) {
             throw new ForbiddenException(
                 'No se encontró el usuario en la solicitud.',
             );
         }
-
-        const user = await this.usersService.findById(sessionUser.id);
 
         if (user.role !== UserRoles.Administrator) {
             throw new ForbiddenException(

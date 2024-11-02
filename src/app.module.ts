@@ -13,6 +13,7 @@ import { AuthMiddleware } from './app/middlewares/auth.middleware';
 import { ResourcesModule } from './app/modules/resources/resources.module';
 import { AuthModule } from './app/modules/auth/auth.module';
 import { ReservationsModule } from './app/modules/reservations/reservations.module';
+import { DatabaseService } from './database/database.service';
 
 @Module({
     imports: [
@@ -27,7 +28,9 @@ import { ReservationsModule } from './app/modules/reservations/reservations.modu
             username: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
+            migrationsRun: false,
             autoLoadEntities: true,
+            synchronize: false,
         }),
         UsersModule,
         ResourcesModule,
@@ -35,20 +38,23 @@ import { ReservationsModule } from './app/modules/reservations/reservations.modu
         ReservationsModule,
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [AppService, DatabaseService],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(AuthMiddleware).exclude(
-            'public',
-            {
-                path: 'auth/login',
-                method: RequestMethod.POST,
-            },
-            {
-                path: 'auth/register',
-                method: RequestMethod.POST,
-            },
-        );
+        consumer
+            .apply(AuthMiddleware)
+            .exclude(
+                'public',
+                {
+                    path: 'auth/login',
+                    method: RequestMethod.POST,
+                },
+                {
+                    path: 'auth/register',
+                    method: RequestMethod.POST,
+                },
+            )
+            .forRoutes('*');
     }
 }

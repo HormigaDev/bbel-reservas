@@ -5,10 +5,14 @@ import {
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../modules/auth/auth.service';
+import { UsersService } from '../modules/users/users.service';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly userService: UsersService,
+    ) {}
 
     async use(req: Request, res: Response, next: NextFunction) {
         try {
@@ -27,14 +31,14 @@ export class AuthMiddleware implements NestMiddleware {
             }
 
             // Validar el token usando AuthService
-            const user = await this.authService.validateToken(token);
+            const data = await this.authService.validateToken(token);
 
-            // Guardar el usuario en la solicitud para acceder a él más adelante
+            const user = await this.userService.findById(Number(data?.id));
             req['user'] = user;
 
             next(); // Continuar con la siguiente función o controlador
-        } catch (error) {
-            console.log(error);
+        } catch (err) {
+            (_ => _)(err);
             throw new UnauthorizedException('Token inválido o expirado');
         }
     }
