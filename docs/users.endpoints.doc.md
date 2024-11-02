@@ -34,7 +34,7 @@ Para algunos endpoints, es necesario estar autenticado y contar con roles espec√
     }
     ```
 
-### Obtener lista de todos los usuarios (requiere rol de Admin)
+### Obtener lista de todos los usuarios
 
 -   **URL**: `/users/all`
 -   **M√©todo**: `GET`
@@ -67,7 +67,7 @@ Para algunos endpoints, es necesario estar autenticado y contar con roles espec√
     }
     ```
 
-### Buscar usuarios (requiere rol de Admin)
+### Buscar usuarios
 
 -   **URL**: `/users/search`
 -   **M√©todo**: `GET`
@@ -119,7 +119,7 @@ Para algunos endpoints, es necesario estar autenticado y contar con roles espec√
     ```
 -   **Respuesta**: Ninguna.
 
-### Eliminar un usuario (requiere rol de Admin)
+### Eliminar un usuario
 
 -   **URL**: `/users/:id`
 -   **M√©todo**: `DELETE`
