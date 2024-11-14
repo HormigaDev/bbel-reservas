@@ -14,9 +14,12 @@ export class AuthController {
 
     @Post('login')
     @HttpCode(200)
-    async login(@Body() loginDto: LoginDto): Promise<{ token: string }> {
-        const token: string = await this.authService.login(loginDto);
-        return { token };
+    async login(
+        @Body() loginDto: LoginDto,
+    ): Promise<{ token: string; user: User }> {
+        const data: { token: string; user: User } =
+            await this.authService.login(loginDto);
+        return data;
     }
 
     @Post('register')

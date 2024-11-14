@@ -18,15 +18,16 @@ import { ChangeUserPasswordDto } from '../users/DTOs/change-user-password.dto';
 export class AuthService implements AuthServiceInterface {
     constructor(private readonly userService: UsersService) {}
 
-    async login(dto: LoginDto): Promise<string> {
+    async login(dto: LoginDto): Promise<{ token: string; user: User }> {
         const user = await this.userService.findByEmail(dto.email);
         if (!user) {
             throw new NotFoundException('Email o contraseña incorrectos');
         }
         await this.verifyPassword(dto.password, user.password);
 
+        delete user.password;
         const token: string = await this.generateToken(user);
-        return token;
+        return { token, user };
     }
 
     async register(dto: CreateUserDto) {
